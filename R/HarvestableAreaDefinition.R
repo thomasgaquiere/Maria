@@ -15,69 +15,70 @@
 #'
 #' @examples
 #'
-#' ExploitPolygones <- HarvestableAreaDefinition(Plot = Plots,DEM = DEM,HCrique = HCrique$distance)
+#' ExploitPolygones <- HarvestableAreaDefinition(plot = Plots,DEM = DEM,verticalcreekheight = VerticalCreekHeight)
 #'
 HarvestableAreaDefinition <- function(plot = Plots,
-                                      DEM = DEMParacou,
-                                      HCrique = Hcrique,
+                                      dtm = DTMParacou,
+                                      verticalcreekheight = VerticalCreekHeight,
                                       advancedloggingparameters = loggingparameters()) {
 
 
-  # On commence par decouper par l'emprise du plot
-  plotTopo <- raster::mask(x = DEM,
-                           mask = plot) # découpage de la topo par l'emprise du plot
-  HCriqueplot <- raster::mask(x = HCrique,
-                              mask = plot) # la même chose pour la hauteur à la crique
+  # Mask rasters by plot
+  #PlotTopo <- raster::mask(x = dtm,
+                        #   mask = plot) # Mask topography raster by plot
+  #CreekVHeightPlot <- raster::mask(x = verticalcreekheight,
+                           #   mask = plot) # Mask verticalcreekheight raster by plot
 
-  # Calcul de la pente
-  plotSlope <- raster::terrain(plotTopo,
+  # Slope Calculation
+  PlotSlope <- raster::terrain(dtm,
                                opt = "slope",
                                units = 'radians',
                                neigbors = 8)
   # RastersToPoints
 
-  plotSlopePoint <-
-    dplyr::as_tibble(raster::rasterToPoints(plotSlope))
+  PlotSlopePoint <-
+    dplyr::as_tibble(raster::rasterToPoints(PlotSlope))
 
-  HCriqueplotPoint <-
-    dplyr::as_tibble(raster::rasterToPoints(HCriqueplot))
+  CreekVHeightPlotPoint <-
+    dplyr::as_tibble(raster::rasterToPoints(verticalcreekheight))
 
-  # left join par x et y
-  plotTib <-
-    dplyr::left_join(plotSlopePoint, HCriqueplotPoint, by = c('x', 'y'))
+  # Join tibbles by x and y
+  PlotTib <-
+    dplyr::left_join(PlotSlopePoint, CreekVHeightPlotPoint, by = c('x', 'y'))
 
     SlpCrit <- atan(advancedloggingparameters$MaxAreaSlope/100)
 
-  plotTib %>% dplyr::rename("HauteurCrique" = names(plotTib[4]))  %>%
+  PlotTib %>% dplyr::rename("CreekVHeight" = names(PlotTib[4]))  %>%
     mutate(Exploit = if_else(
-      condition = HauteurCrique > 2 &
-        slope <= SlpCrit , # on est en radians pour la pente, donc .264 radians = 27% de pente
+      condition = CreekVHeight > 2 &
+        slope <= SlpCrit ,
       true = 1,
       false = 0
-    )) -> plotSlopeHCrique
+    )) -> PlotSlopeCreekVHeight # Identify harvestable area (1) /  non-harvestable area (0) by slope and Creek Vertical Height
 
-  # on a pu determiner les zones exploitables ou non
-  # maintenant on transforme ça en polygones, plotSlopeHCrique pourrait etre reutilise pour la pente
 
-  # on retransforme en raster
+
+
+  # transform tibble to raster
   RasterExploit <-
-    raster::rasterFromXYZ(plotSlopeHCrique, crs = 32622) # set crs to WGS84 UTM 22N
+    raster::rasterFromXYZ(PlotSlopeCreekVHeight, crs = 32622) # set crs to WGS84 UTM 22N
 
-  # raster en polygone
+  # raster to polygon
   PolygoneExploit <-
     raster::rasterToPolygons(x = RasterExploit$Exploit,
                              n = 16,
                              dissolve = TRUE)
 
-  ## On quitte le monde merveilleux du package raster pour passer a celui de sf
 
-  sf_PolygoneExploit <- sf::st_as_sf(PolygoneExploit)
 
-  ## On transforme nos deux gros polygones (Exploit=1 et Exploit=0 en pleins de petits, par ce qui s'appelait disaggregate dans le package sp)
+  sf_PolygoneExploit <- sf::st_as_sf(PolygoneExploit) # transform PolygonExploit to an sf object
+
+  # Disaggregate PolygonExploit
 
   ExploitPolygones <-
-    sf::st_cast(x = sf_PolygoneExploit, to = "POLYGON") # on a maintenant pleins de polygones, dont pleins de petits isolés
+    sf::st_cast(x = sf_PolygoneExploit, to = "POLYGON")
 
   return(ExploitPolygones)
 
 }
+
