@@ -37,7 +37,7 @@ secondtrailsopening <- function(DEM = DemParacou,
                                                        list(Slope = 22, Cost = 60),
                                                        list(Slope = 27, Cost = 600),
                                                        list(Slope = Inf, Cost = 1000)),
-                                scenarios = NULL
+                                scenarios = NULL,
                                 otherlogginparameters = logginparameters()) {
 
   # Arguments check
