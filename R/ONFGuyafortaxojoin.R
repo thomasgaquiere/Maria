@@ -22,7 +22,7 @@
 #' @examples
 #' data(Paracou6_2016)
 #' data(SpeciesCriteria)
-#' ONFGuyafortaxojoin(Paracou6_2016, SpeciesCriteria)
+#' new <- ONFGuyafortaxojoin(Paracou6_2016, SpeciesCriteria)
 #'
 ONFGuyafortaxojoin <- function(
   inventory,
@@ -62,6 +62,8 @@ ONFGuyafortaxojoin <- function(
   VernName.species <- VolumeCumSum <- Xutm <- Yutm <- aCoef <- NULL
   alpha <- alpha.family <- alpha.genus <- alpha.species <- bCoef <- NULL
   beta.family <- beta.genus <- beta.species <- geometry <- idTree <- NULL
+  Aggregative.species <- Aggregative.genus <- NULL
+
 
   # Function
   genuscriteria <- speciescriteria %>% # for economic names that relate to entire genus
@@ -88,16 +90,21 @@ ONFGuyafortaxojoin <- function(
     mutate(MinFD = ifelse(is.na(MinFD.species), MinFD.genus, MinFD.species)) %>%
     mutate(UpMinFD = ifelse(is.na(UpMinFD.species), UpMinFD.genus, UpMinFD.species)) %>%
     mutate(MaxFD = ifelse(is.na(MaxFD.species), MaxFD.genus, MaxFD.species)) %>%
+    mutate(Aggregative = ifelse(is.na(Aggregative.species), Aggregative.genus, Aggregative.species)) %>%
+
 
     dplyr::select(-Commercial.species, -Commercial.genus, -MinFD.species, -MinFD.genus,
-                  -UpMinFD.species, -UpMinFD.genus, -MaxFD.species, -MaxFD.genus) %>%
+                  -UpMinFD.species, -UpMinFD.genus, -MaxFD.species, -MaxFD.genus,
+                  -Aggregative.species, -Aggregative.genus) %>%
     mutate(Commercial = as.character(Commercial)) %>%
 
     # Exceptions management (Commercial == "0" in speciescriteria)
     mutate(ONFName = ifelse(Commercial == "0", NA, ONFName)) %>%
     mutate(MinFD = ifelse(Commercial == "0", NA, MinFD)) %>%
     mutate(UpMinFD = ifelse(Commercial == "0", NA, UpMinFD)) %>%
-    mutate(MaxFD = ifelse(Commercial == "0", NA, MaxFD))
+    mutate(MaxFD = ifelse(Commercial == "0", NA, MaxFD)) %>%
+    mutate(Aggregative = ifelse(Commercial == "0", NA, Aggregative))
+
 
   inventory <- inventory %>%
     mutate(Commercial = ifelse(is.na(Commercial), "0", Commercial)) %>%
