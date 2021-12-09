@@ -8,7 +8,7 @@ HarvestableAreaDefinition(
   plot,
   dtm,
   verticalcreekheight,
-  advancedloggingparameters
+  advancedloggingparameters = loggingparameters()
 )
 }
 \arguments{
@@ -23,8 +23,10 @@ HarvestableAreaDefinition(
 \code{\link{loggingparameters}} (list)}
 }
 \value{
+
 A collection of polygons defined as 1 : harvestable area, 0 :
 non-harvestable area
+
 }
 \description{
 HarvestableAreaDefinition
@@ -33,6 +35,7 @@ HarvestableAreaDefinition
 data(Plots)
 data(DTMParacou)
 data(VerticalCreekHeight)
+
 
 
 HarvestableArea <- HarvestableAreaDefinition(plot = Plots,

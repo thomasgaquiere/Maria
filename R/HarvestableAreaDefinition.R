@@ -7,6 +7,7 @@
 #' @param advancedloggingparameters Other parameters of the logging simulator
 #'   \code{\link{loggingparameters}} (list)
 #'
+
 #' @return A collection of polygons defined as 1 : harvestable area, 0 :
 #'   non-harvestable area
 #'
@@ -15,7 +16,9 @@
 #' @importFrom sf st_as_sf st_cast
 #' @importFrom raster mask terrain rasterFromXYZ rasterToPolygons
 #'   rasterToPoints
+
 #' @importFrom  dplyr as_tibble left_join rename mutate if_else
+#' @importFrom  magrittr %>%
 #'
 #' @examples
 #' data(Plots)
@@ -23,6 +26,7 @@
 #' data(VerticalCreekHeight)
 #'
 #'
+
 #' HarvestableArea <- HarvestableAreaDefinition(plot = Plots,
 #'                                              dtm = DTMParacou,
 #'                                              verticalcreekheight = VerticalCreekHeight,
@@ -34,12 +38,14 @@ HarvestableAreaDefinition <- function(
   dtm,
   verticalcreekheight,
   advancedloggingparameters
-){
+)
+
+
 
   # Variables
   PlotSlope <- PlotSlopePoint <- CreekVHeightPlotPoint <- PlotTib <- NULL
-  SlpCrit <- PlotSlopeCreekVHeight <- RasterExploit <- PolygoneExploit <- NULL
-  sf_PolygoneExploit <- ExploitPolygones <- CreekVHeight<- slope <-  NULL
+  SlpCrit <- PlotSlopeCreekVHeight <- RasterHarvestable <- PolygonHarvestable <- NULL
+  sf_PolygonHarvestable <- HarvestablePolygons <- CreekVHeight<- slope <-  NULL
 
 
   # Mask rasters by plot
@@ -68,7 +74,7 @@ HarvestableAreaDefinition <- function(
   SlpCrit <- atan(advancedloggingparameters$MaxAreaSlope/100)
 
   PlotTib %>% rename("CreekVHeight" = names(PlotTib[4]))  %>%
-    mutate(Exploit = if_else(
+    mutate(Harvestable = if_else(
       condition = CreekVHeight > 2 &
         slope <= SlpCrit,
       true = 1,
@@ -79,25 +85,27 @@ HarvestableAreaDefinition <- function(
 
 
   # transform tibble to raster
-  RasterExploit <-
-    rasterFromXYZ(PlotSlopeCreekVHeight, crs = 32622) # set crs to WGS84 UTM 22N
+  RasterHarvestable <-
+    rasterFromXYZ(PlotSlopeCreekVHeight, crs = raster::crs(dtm)) # set crs to WGS84 UTM 22N
 
   # raster to polygon
-  PolygoneExploit <-
-    rasterToPolygons(x = RasterExploit$Exploit,
+  PolygonHarvestable <-
+    rasterToPolygons(x = RasterHarvestable$Harvestable,
                      n = 16,
                      dissolve = TRUE)
 
 
 
-  sf_PolygoneExploit <- st_as_sf(PolygoneExploit) # transform PolygonExploit to an sf object
+  sf_PolygonHarvestable <- st_as_sf(PolygonHarvestable) # transform PolygonExploit to an sf object
 
   # Disaggregate PolygonExploit
+
 
   ExploitPolygones <-
     st_cast(x = sf_PolygoneExploit, to = "POLYGON", warn = FALSE)
 
-  return(ExploitPolygones)
+
+  return(HarvestablePolygons)
 
 }
 
