@@ -1,15 +1,19 @@
 #' HarvestableAreaDefinition
 #'
-#' @param plot Studied plot (SpatialPolygonsDataFrame)
-#' @param dtm Digital terrain model (Large RasterLayer)
+
+#' @param topography Digital terrain model (Large RasterLayer)
 #' @param verticalcreekheight Relative elevation from nearest channel network
 #'   (Large RasterLayer)
 #' @param advancedloggingparameters Other parameters of the logging simulator
 #'   \code{\link{loggingparameters}} (list)
 #'
 
-#' @return A collection of polygons defined as 1 : harvestable area, 0 :
-#'   non-harvestable area
+#' @return A list with:
+#' - A collection of polygons defined as 1 : harvestable area, 0 :
+#'   non-harvestable area (sf polygon)
+#' - A raster with slope (in radians) characteristic of the studied plot
+#' (Large RasterLayer)
+#'
 #'
 #' @export
 #'
@@ -27,18 +31,17 @@
 #'
 #'
 
-#' HarvestableArea <- HarvestableAreaDefinition(plot = Plots,
-#'                                              dtm = DTMParacou,
+#' HarvestableArea <- HarvestableAreaDefinition(topography = DTMParacou,
 #'                                              verticalcreekheight = VerticalCreekHeight,
 #'                                              advancedloggingparameters = loggingparameters())
-#' plot(HarvestableArea)
+#'
+#' plot(HarvestableArea[[1]])
 #'
 HarvestableAreaDefinition <- function(
-  plot,
-  dtm,
+  topography,
   verticalcreekheight,
-  advancedloggingparameters
-)
+  advancedloggingparameters = loggingparameters()
+){
 
 
 
@@ -48,14 +51,8 @@ HarvestableAreaDefinition <- function(
   sf_PolygonHarvestable <- HarvestablePolygons <- CreekVHeight<- slope <-  NULL
 
 
-  # Mask rasters by plot
-  #PlotTopo <- raster::mask(x = dtm,
-  #   mask = plot) # Mask topography raster by plot
-  #CreekVHeightPlot <- raster::mask(x = verticalcreekheight,
-  #   mask = plot) # Mask verticalcreekheight raster by plot
-
   # Slope Calculation
-  PlotSlope <- terrain(dtm,
+  PlotSlope <- terrain(topography,
                        opt = "slope",
                        units = 'radians',
                        neighbors = 8)
@@ -86,7 +83,7 @@ HarvestableAreaDefinition <- function(
 
   # transform tibble to raster
   RasterHarvestable <-
-    rasterFromXYZ(PlotSlopeCreekVHeight, crs = raster::crs(dtm)) # set crs to WGS84 UTM 22N
+    rasterFromXYZ(PlotSlopeCreekVHeight, crs = raster::crs(topography)) # set crs to WGS84 UTM 22N
 
   # raster to polygon
   PolygonHarvestable <-
@@ -101,11 +98,12 @@ HarvestableAreaDefinition <- function(
   # Disaggregate PolygonExploit
 
 
-  ExploitPolygones <-
-    st_cast(x = sf_PolygoneExploit, to = "POLYGON", warn = FALSE)
+  HarvestablePolygons <-
+    st_cast(x = sf_PolygonHarvestable, to = "POLYGON", warn = FALSE)
 
 
-  return(HarvestablePolygons)
+  return(list(HarvestablePolygons=HarvestablePolygons,
+              PlotSlope=PlotSlope))
 
 }
 
