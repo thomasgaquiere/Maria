@@ -24,14 +24,16 @@ data(Paracou6_2016)
 data(DTMParacou)
 data(PlotSlope)
 data(SpeciesCriteria)
+data(MainTrails)
+data(HarvestablePolygons)
 
 inventory <- addtreedim(inventorycheckformat(Paracou6_2016),
 volumeparameters = ForestZoneVolumeParametersTable)
 
 inventory <- suppressMessages(treeselection(inventory, objective = 20, scenario ="manual",
- fuel = "2", diversification = TRUE, specieslax = FALSE,
+ fuel = "2", diversification = TRUE, specieslax = FALSE, maintrails = MainTrails,
  objectivelax = TRUE, topography = DTMParacou, plotslope = PlotSlope,
- speciescriteria = SpeciesCriteria,
+ speciescriteria = SpeciesCriteria, harvestablepolygons = HarvestablePolygons,
  advancedloggingparameters = loggingparameters())$inventory)
 
 inventory <- inventory \%>\%

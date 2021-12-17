@@ -332,11 +332,15 @@ treefelling <- function(
 #'@importFrom dplyr mutate rowwise
 #'
 #' @examples
+#' data(MainTrails)
+#' data(HarvestablePolygons)
+#'
 #' inventory <- addtreedim(inventorycheckformat(Paracou6_2016),
 #' volumeparameters = ForestZoneVolumeParametersTable)
 #'
 #' inventory <- treeselection(inventory, objective = 20, scenario ="manual",
-#'  fuel = "2", diversification = TRUE, specieslax = FALSE,
+#'  fuel = "2", diversification = TRUE, specieslax = FALSE, maintrails = MainTrails,
+#'  harvestablepolygons = HarvestablePolygons,
 #'  objectivelax = TRUE, topography = DTMParacou, plotslope = PlotSlope,
 #'  speciescriteria = SpeciesCriteria,
 #'  advancedloggingparameters = loggingparameters())$inventory
@@ -453,14 +457,16 @@ directionalfellingsuccessdef <- function(
 #' data(DTMParacou)
 #' data(PlotSlope)
 #' data(SpeciesCriteria)
+#' data(MainTrails)
+#' data(HarvestablePolygons)
 #'
 #' inventory <- addtreedim(inventorycheckformat(Paracou6_2016),
 #' volumeparameters = ForestZoneVolumeParametersTable)
 #'
 #' inventory <- suppressMessages(treeselection(inventory, objective = 20, scenario ="manual",
-#'  fuel = "2", diversification = TRUE, specieslax = FALSE,
+#'  fuel = "2", diversification = TRUE, specieslax = FALSE, maintrails = MainTrails,
 #'  objectivelax = TRUE, topography = DTMParacou, plotslope = PlotSlope,
-#'  speciescriteria = SpeciesCriteria,
+#'  speciescriteria = SpeciesCriteria, harvestablepolygons = HarvestablePolygons,
 #'  advancedloggingparameters = loggingparameters())$inventory)
 #'
 #' inventory <- inventory %>%
@@ -581,6 +587,8 @@ rotatepolygon <- function(
 #'@importFrom matlib angle
 #'
 #' @examples
+#' data(HarvestablePolygons)
+#' data(MainTrails)
 #' MainTrail <- sf::st_linestring(matrix(c(286400, 582945,
 #'                                         286400, 583250,
 #'                                         286700, 583250,
@@ -611,7 +619,8 @@ rotatepolygon <- function(
 #'  fuel = "2", diversification = TRUE, specieslax = FALSE,
 #'  objectivelax = TRUE, topography = DTMParacou, plotslope = PlotSlope,
 #'  speciescriteria = SpeciesCriteria,
-#'  advancedloggingparameters = loggingparameters())$inventory)
+#'  advancedloggingparameters = loggingparameters(),
+#'  maintrails = MainTrails, harvestablepolygons = HarvestablePolygons)$inventory)
 #'
 #' FutureReserveCrowns <- inventory %>% # create an object with future/reserve crowns only
 #'  dplyr::filter(LoggingStatus == "future" | LoggingStatus == "reserve") %>%

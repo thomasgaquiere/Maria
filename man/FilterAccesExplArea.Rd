@@ -7,7 +7,6 @@
 FilterAccesExplArea(
   harvestablepolygons,
   maintrails,
-  winching,
   advancedloggingparameters = loggingparameters()
 )
 }
@@ -16,9 +15,6 @@ FilterAccesExplArea(
 (default: \code{\link{HarvestableAreaDefinition}}) (sf polygons data.frame)}
 
 \item{maintrails}{Main trails defined at the entire harvestable area (sf polylines)}
-
-\item{winching}{no cable or grapple = "0", only cable = "1", grapple + cable =
-"2"}
 
 \item{advancedloggingparameters}{Other parameters of the logging simulator
 \code{\link{loggingparameters}} (list) MainTrail (multiline)}
@@ -32,7 +28,7 @@ FilterAccesExplArea
 \examples{
 
  AccessPolygones <-  FilterAccesExplArea (harvestablepolygons = HarvestablePolygons,
- maintrails = MainTrails, winching = "0",
+ maintrails = MainTrails,
  advancedloggingparameters = loggingparameters())
 
 }

@@ -5,8 +5,6 @@
 #'
 #' @param maintrails Main trails defined at the entire harvestable area (sf polylines)
 #'
-#' @param winching no cable or grapple = "0", only cable = "1", grapple + cable =
-#'  "2"
 #'
 #' @param advancedloggingparameters Other parameters of the logging simulator
 #' \code{\link{loggingparameters}} (list) MainTrail (multiline)
@@ -21,12 +19,11 @@
 #' @examples
 #'
 #'  AccessPolygones <-  FilterAccesExplArea (harvestablepolygons = HarvestablePolygons,
-#'  maintrails = MainTrails, winching = "0",
+#'  maintrails = MainTrails,
 #'  advancedloggingparameters = loggingparameters())
 #'
 FilterAccesExplArea <- function (harvestablepolygons ,
                                  maintrails ,
-                                 winching,
                                  advancedloggingparameters = loggingparameters()) {
 
   # Global Variables
