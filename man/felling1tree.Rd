@@ -55,6 +55,8 @@ success is by default 60\%, and can be changed with the
 \code{advancedloggingparameters} argument.
 }
 \examples{
+data(HarvestablePolygons)
+data(MainTrails)
 MainTrail <- sf::st_linestring(matrix(c(286400, 582945,
                                         286400, 583250,
                                         286700, 583250,
@@ -85,7 +87,8 @@ inventory <- suppressMessages(treeselection(inventory, objective = 20, scenario 
  fuel = "2", diversification = TRUE, specieslax = FALSE,
  objectivelax = TRUE, topography = DTMParacou, plotslope = PlotSlope,
  speciescriteria = SpeciesCriteria,
- advancedloggingparameters = loggingparameters())$inventory)
+ advancedloggingparameters = loggingparameters(),
+ maintrails = MainTrails, harvestablepolygons = HarvestablePolygons)$inventory)
 
 FutureReserveCrowns <- inventory \%>\% # create an object with future/reserve crowns only
  dplyr::filter(LoggingStatus == "future" | LoggingStatus == "reserve") \%>\%
