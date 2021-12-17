@@ -50,7 +50,7 @@
 #' topography = DTMParacou, plotslope = PlotSlope, maintrails = MainTrails,
 #' harvestablepolygons = HarvestablePolygons,
 #' speciescriteria = SpeciesCriteria, objective = scenarios$objective,
-#' scenario ="RIL3", fuel = "2", diversification = TRUE, specieslax = TRUE,
+#' scenario ="RIL3", fuel = "0", diversification = TRUE, specieslax = TRUE,
 #' objectivelax = TRUE,
 #' advancedloggingparameters = loggingparameters())
 #'
@@ -64,7 +64,7 @@
 #'                            list(Slope = 27, Cost = 600),
 #'                            list(Slope = Inf, Cost = 1000)),
 #'                       list(list(CostType = "Initial", CostValue = 1000),
-#'                            list(CostType = "Access", CostValue = 1000),
+#'                            list(CostType = "Access", CostValue = 10000),
 #'                            list(CostType = "BigTrees", CostValue = 500),
 #'                            list(CostType = "Reserves", CostValue = 500),
 #'                            list(CostType = "Futures", CostValue = 50),
