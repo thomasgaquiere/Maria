@@ -6,9 +6,8 @@
 \usage{
 secondtrailsopening(
   DTM,
-  plotslope,
   plots,
-  harvestablepolygons,
+  verticalcreekheight,
   maintrails,
   treeselectionoutputs,
   CostMatrix = list(list(list(Slope = 3, Cost = 3), list(Slope = 5, Cost = 5),
@@ -26,12 +25,10 @@ secondtrailsopening(
 \arguments{
 \item{DTM}{Digital terrain model (raster)}
 
-\item{plotslope}{A categorical transition layer of longitudinal and transversal slope.}
-
 \item{plots}{Studied plots (sf data.frame)}
 
-\item{harvestablepolygons}{Accessible area of the inventoried plot
-(default: \code{\link{HarvestableAreaDefinition}}) (sf polygons data.frame)}
+\item{verticalcreekheight}{Relative elevation from nearest channel network
+(Large RasterLayer)}
 
 \item{maintrails}{Main trails defined at the entire harvestable area (sf polylines)}
 
@@ -68,26 +65,28 @@ data(MainTrails)
 data(Plots)
 data(PlotSlope)
 data("SpeciesCriteria")
+data(VerticalCreekHeight)
 
-scenarios <- scenariosparameters(scenario = "RIL3", objective = 15)
+scenarios <- scenariosparameters(scenario = "RIL3", objective = 20)
 
 inventory <- ONFGuyafortaxojoin(addtreedim(inventorycheckformat(Paracou6_2016),
  volumeparameters = ForestZoneVolumeParametersTable),SpeciesCriteria)
 
 AccessPolygons <- FilterAccesExplArea(harvestablepolygons = HarvestablePolygons,
 maintrails = MainTrails,
-winching = scenarios$winching,
 advancedloggingparameters = loggingparameters())
 
 treeselectionoutputs <- treeselection(inventory,
-topography = DTMParacou, plotslope = PlotSlope,
+topography = DTMParacou, plotslope = PlotSlope, maintrails = MainTrails,
+harvestablepolygons = HarvestablePolygons,
 speciescriteria = SpeciesCriteria, objective = scenarios$objective,
-scenario ="manual", fuel = "2", diversification = TRUE, specieslax = FALSE,
+scenario ="RIL3", fuel = "2", diversification = TRUE, specieslax = TRUE,
 objectivelax = TRUE,
 advancedloggingparameters = loggingparameters())
 
-secondtrails <- secondtrailsopening(DTM = DTMParacou, plotslope =  PlotSlope,plots = Plots,
-  harvestablepolygons = HarvestablePolygons, maintrails = MainTrails, treeselectionoutputs,
+secondtrails <- secondtrailsopening(DTM = DTMParacou,plots = Plots,
+   maintrails = MainTrails, treeselectionoutputs = treeselectionoutputs,
+   verticalcreekheight = VerticalCreekHeight,
   CostMatrix = list(list(list(Slope = 3, Cost = 3),
                            list(Slope = 5, Cost = 5),
                            list(Slope = 12, Cost = 20),
