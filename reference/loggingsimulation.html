@@ -70,6 +70,8 @@ volume and damages quantification.</p>
   <span class="va">inventory</span>,
   <span class="va">topography</span>,
   <span class="va">relativeelevation</span>,
+  <span class="va">maintrails</span>,
+  <span class="va">harvestablepolygons</span>,
   <span class="va">speciescriteria</span>,
   <span class="va">volumeparameters</span>,
   <span class="va">scenario</span>,
@@ -97,6 +99,11 @@ volume and damages quantification.</p>
 or SRTM) (<code><a href="DTMParacou.html">DTMParacou</a></code>) (RasterLayer)</p></dd>
 <dt>relativeelevation</dt>
 <dd><p>(RasterLayer)</p></dd>
+<dt>maintrails</dt>
+<dd><p>Main trails defined at the entire harvestable area (sf polylines)</p></dd>
+<dt>harvestablepolygons</dt>
+<dd><p>Accessible area of the inventoried plot
+(default: <code><a href="HarvestableAreaDefinition.html">HarvestableAreaDefinition</a></code>) (sf polygons data.frame)</p></dd>
 <dt>speciescriteria</dt>
 <dd><p>Table of species exploitability criteria : species
 names, economic interest level, minimum and maximum felling diameter, in the
@@ -174,13 +181,16 @@ and its species, genus or family. (data.frame)</p></dd>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">Paracou6_2016</span><span class="op">)</span> <span class="co"># inventory</span></span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">DTMParacou</span><span class="op">)</span> <span class="co"># topography</span></span>
-<span class="r-in"><span class="co"># data() relative elevation</span></span>
+<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">MainTrails</span><span class="op">)</span>  <span class="co"># MainTrails</span></span>
+<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">HarvestablePolygons</span><span class="op">)</span> <span class="co"># HarvestablePolygons</span></span>
+<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">VerticalCreekHeight</span><span class="op">)</span> <span class="co"># relative elevation</span></span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">SpeciesCriteria</span><span class="op">)</span> <span class="co"># species exploitability criteria</span></span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">ForestZoneVolumeParametersTable</span><span class="op">)</span> <span class="co"># volume parameters</span></span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">ParamCrownDiameterAllometry</span><span class="op">)</span> <span class="co"># parameters values of the crown diameter allometry</span></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="va">Rslt</span> <span class="op">&lt;-</span> <span class="fu">loggingsimulation</span><span class="op">(</span><span class="va">Paracou6_2016</span>, topography <span class="op">=</span> <span class="va">DTMParacou</span>,</span>
-<span class="r-in"> relativeelevation  <span class="op">=</span> <span class="va">DTMParacou</span>, speciescriteria <span class="op">=</span> <span class="va">SpeciesCriteria</span>,</span>
+<span class="r-in"> relativeelevation  <span class="op">=</span> <span class="va">VerticalCreekHeight</span>, speciescriteria <span class="op">=</span> <span class="va">SpeciesCriteria</span>,</span>
+<span class="r-in"> harvestablepolygons <span class="op">=</span> <span class="va">HarvestablePolygons</span>, maintrails <span class="op">=</span> <span class="va">MainTrails</span>,</span>
 <span class="r-in"> volumeparameters <span class="op">=</span> <span class="va">ForestZoneVolumeParametersTable</span>, scenario <span class="op">=</span> <span class="st">"manual"</span>,</span>
 <span class="r-in"> objective <span class="op">=</span> <span class="fl">20</span>, fuel <span class="op">=</span> <span class="st">"2"</span>, diversification <span class="op">=</span> <span class="cn">TRUE</span>, winching <span class="op">=</span> <span class="st">"2"</span>,</span>
 <span class="r-in"> directionalfelling <span class="op">=</span> <span class="st">"2"</span>, specieslax <span class="op">=</span> <span class="cn">FALSE</span>, objectivelax <span class="op">=</span> <span class="cn">TRUE</span>,</span>

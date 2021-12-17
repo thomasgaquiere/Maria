@@ -79,12 +79,9 @@
 damage and unused part of logged trees for fuel = "1", exploitation of
 hollow trees, damage and and unused part of the log for fuel = "2"</p></dd>
 <dt>directionalfelling</dt>
-<dd><p>Directional felling =
-"0": only to direct the foot of the tree towards the trail
-"1": to direct the foot of the tree towards the trail + to avoid damage to
-future and reserve trees
-"2": to avoid damage to future and reserve trees + orientation angle
-to the trail</p></dd>
+<dd><p>Directional felling = "0" (absent), "1" (only to
+avoid damage to future and reserve trees), "2" (to avoid damage to future and
+reserve trees and to position the log relative to the track)</p></dd>
 <dt>MainTrail</dt>
 <dd><p>Main trail (sfg)</p></dd>
 <dt>ScndTrail</dt>
@@ -106,9 +103,11 @@ according to the chosen scenario</p></li>
     <p>The felling of the tree creates a tree (including crown) on the
 ground, with dimensions calculated with specific allometries
 ('advancedloggingparameters').</p>
-<p>RIL1/RIL2broken/RIL2:</p><ul><li><p>at 40%: random fall</p></li>
+<p>RIL1: random fall</p>
+<p>RIL2broken/RIL2:</p><ul><li><p>at 40%: random fall</p></li>
 <li><p>at 60% ('TreefallSuccessProportion'):
-<em>base of the tree towards the nearest trail</em> (main or 2ndary)</p></li>
+priority 1: <em>base of the tree towards the nearest trail</em> (main or 2ndary),
+priority 2: avoid futures and reserves.</p></li>
 </ul><p>RIL3/RIL3 timber + fuel wood:</p><ul><li><p>at 40%: random fall</p></li>
 <li><p>at 60% ('TreefallSuccessProportion'):</p><ul><li><p>if RIL3 + fuel &amp; trees &lt; 6 m from the trail and slope &lt;20% (grapple use):</p><ul><li><p>no particular angle to orientate to the trail,
 only to orient the tree <em>crown</em> as close as possible to the trail</p></li>

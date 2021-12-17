@@ -99,12 +99,9 @@ CrownHeight, DBH, TrunkHeight, TreeHeight, TreeFellingOrientationSuccess</p></dd
 damage and unused part of logged trees for fuel = "1", exploitation of
 hollow trees, damage and and unused part of the log for fuel = "2"</p></dd>
 <dt>directionalfelling</dt>
-<dd><p>Directional felling =
-"0": only to direct the foot of the tree towards the trail
-"1": to direct the foot of the tree towards the trail + to avoid damage to
-future and reserve trees
-"2": to avoid damage to future and reserve trees + orientation angle
-to the trail</p></dd>
+<dd><p>Directional felling = "0" (absent), "1" (only to
+avoid damage to future and reserve trees), "2" (to avoid damage to future and
+reserve trees and to position the log relative to the track)</p></dd>
 <dt>MainTrail</dt>
 <dd><p>(sfg)</p></dd>
 <dt>ScndTrail</dt>
@@ -131,7 +128,9 @@ the tree.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">MainTrail</span> <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st.html" class="external-link">st_linestring</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">286400</span>, <span class="fl">582945</span>,</span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">HarvestablePolygons</span><span class="op">)</span></span>
+<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">MainTrails</span><span class="op">)</span></span>
+<span class="r-in"><span class="va">MainTrail</span> <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st.html" class="external-link">st_linestring</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">286400</span>, <span class="fl">582945</span>,</span>
 <span class="r-in">                                        <span class="fl">286400</span>, <span class="fl">583250</span>,</span>
 <span class="r-in">                                        <span class="fl">286700</span>, <span class="fl">583250</span>,</span>
 <span class="r-in">                                        <span class="fl">286700</span>, <span class="fl">582945</span>,</span>
@@ -161,7 +160,8 @@ the tree.</p>
 <span class="r-in"> fuel <span class="op">=</span> <span class="st">"2"</span>, diversification <span class="op">=</span> <span class="cn">TRUE</span>, specieslax <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span class="r-in"> objectivelax <span class="op">=</span> <span class="cn">TRUE</span>, topography <span class="op">=</span> <span class="va">DTMParacou</span>, plotslope <span class="op">=</span> <span class="va">PlotSlope</span>,</span>
 <span class="r-in"> speciescriteria <span class="op">=</span> <span class="va">SpeciesCriteria</span>,</span>
-<span class="r-in"> advancedloggingparameters <span class="op">=</span> <span class="fu"><a href="loggingparameters.html">loggingparameters</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">inventory</span><span class="op">)</span></span>
+<span class="r-in"> advancedloggingparameters <span class="op">=</span> <span class="fu"><a href="loggingparameters.html">loggingparameters</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span class="r-in"> maintrails <span class="op">=</span> <span class="va">MainTrails</span>, harvestablepolygons <span class="op">=</span> <span class="va">HarvestablePolygons</span><span class="op">)</span><span class="op">$</span><span class="va">inventory</span><span class="op">)</span></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="va">FutureReserveCrowns</span> <span class="op">&lt;-</span> <span class="va">inventory</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> <span class="co"># create an object with future/reserve crowns only</span></span>
 <span class="r-in"> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">LoggingStatus</span> <span class="op">==</span> <span class="st">"future"</span> <span class="op">|</span> <span class="va">LoggingStatus</span> <span class="op">==</span> <span class="st">"reserve"</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span>
