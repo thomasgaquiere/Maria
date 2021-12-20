@@ -199,7 +199,7 @@ harvestable <- function(
                                          maintrails = maintrails,
                                          advancedloggingparameters = loggingparameters())
 
-   PUSpatInventory<- SpatInventory %>% mutate(PU = c(sf::st_contains(AccessPolygons, SpatInventory,sparse = F))) %>% # check if trees are contained in PUs
+   PUSpatInventory<- SpatInventory %>% mutate(PU = as.vector(sf::st_contains(AccessPolygons, SpatInventory,sparse = F))) %>% # check if trees are contained in PUs
      dplyr::select(idTree , PU)
 
    inventory<- inventory %>% left_join(PUSpatInventory, by = "idTree")%>%
