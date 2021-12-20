@@ -8,7 +8,6 @@ secondtrailsopening(
   DTM,
   plots,
   verticalcreekheight,
-  maintrails,
   treeselectionoutputs,
   CostMatrix = list(list(list(Slope = 3, Cost = 3), list(Slope = 5, Cost = 5),
     list(Slope = 12, Cost = 20), list(Slope = 22, Cost = 60), list(Slope = 27, Cost =
@@ -25,12 +24,10 @@ secondtrailsopening(
 \arguments{
 \item{DTM}{Digital terrain model (raster)}
 
-\item{plots}{Studied plots (sf data.frame)}
+\item{plots}{Studied plots (SpatialPolygonsDataFrame)}
 
 \item{verticalcreekheight}{Relative elevation from nearest channel network
 (Large RasterLayer)}
-
-\item{maintrails}{Main trails defined at the entire harvestable area (sf polylines)}
 
 \item{treeselectionoutputs}{A list with:
 \itemize{
@@ -67,7 +64,7 @@ data(PlotSlope)
 data("SpeciesCriteria")
 data(VerticalCreekHeight)
 
-scenarios <- scenariosparameters(scenario = "RIL3", objective = 20)
+scenarios <- scenariosparameters(scenario = "RIL3")
 
 inventory <- ONFGuyafortaxojoin(addtreedim(inventorycheckformat(Paracou6_2016),
  volumeparameters = ForestZoneVolumeParametersTable),SpeciesCriteria)
@@ -80,14 +77,16 @@ treeselectionoutputs <- treeselection(inventory,
 topography = DTMParacou, plotslope = PlotSlope, maintrails = MainTrails,
 harvestablepolygons = HarvestablePolygons,
 speciescriteria = SpeciesCriteria, objective = scenarios$objective,
-scenario ="RIL3", fuel = "2", diversification = TRUE, specieslax = TRUE,
+scenario = "RIL3",
 objectivelax = TRUE,
 advancedloggingparameters = loggingparameters())
 
-secondtrails <- secondtrailsopening(DTM = DTMParacou,plots = Plots,
-   maintrails = MainTrails, treeselectionoutputs = treeselectionoutputs,
+secondtrails <- secondtrailsopening(DTM = DTMParacou,
+   plots = Plots,
+
+   treeselectionoutputs = treeselectionoutputs,
    verticalcreekheight = VerticalCreekHeight,
-  CostMatrix = list(list(list(Slope = 3, Cost = 3),
+   CostMatrix = list(list(list(Slope = 3, Cost = 3),
                            list(Slope = 5, Cost = 5),
                            list(Slope = 12, Cost = 20),
                            list(Slope = 22, Cost = 60),

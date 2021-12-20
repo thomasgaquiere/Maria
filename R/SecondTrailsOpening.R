@@ -1,8 +1,7 @@
 #' secondtrailsopening
 #'
 #' @param DTM Digital terrain model (raster)
-#' @param plots Studied plots (sf data.frame)
-#' @param maintrails Main trails defined at the entire harvestable area (sf polylines)
+#' @param plots Studied plots (SpatialPolygonsDataFrame)
 #' @param treeselectionoutputs A list with:
 #'  - your inventory with: "DistCrit", "Slope", "SlopeCrit",
 #'  "LoggingStatus", "Selected", "Up", "VolumeCumSum", "ProbedHollowProba",
@@ -22,7 +21,7 @@
 #'
 #' @importFrom  sf st_cast st_as_sf st_intersection st_union st_sample st_join st_buffer as_Spatial st_centroid st_set_precision st_make_valid st_set_agr st_geometry st_area st_is_empty st_set_crs st_crs
 #' @importFrom dplyr mutate row_number select as_tibble left_join if_else filter arrange desc
-#' @importFrom raster raster extend extent focal res crs mask crop rasterize rasterToPoints rasterFromXYZ aggregate values ncell values<-
+#' @importFrom raster raster extend extent focal res crs mask crop rasterize rasterToPoints rasterToPolygons rasterFromXYZ aggregate values ncell values<-
 #' @importFrom sp  proj4string<- coordinates<-
 #'
 #' @export
@@ -37,7 +36,7 @@
 #' data("SpeciesCriteria")
 #' data(VerticalCreekHeight)
 #'
-#' scenarios <- scenariosparameters(scenario = "RIL3", objective = 20)
+#' scenarios <- scenariosparameters(scenario = "RIL3")
 #'
 #' inventory <- ONFGuyafortaxojoin(addtreedim(inventorycheckformat(Paracou6_2016),
 #'  volumeparameters = ForestZoneVolumeParametersTable),SpeciesCriteria)
@@ -50,14 +49,16 @@
 #' topography = DTMParacou, plotslope = PlotSlope, maintrails = MainTrails,
 #' harvestablepolygons = HarvestablePolygons,
 #' speciescriteria = SpeciesCriteria, objective = scenarios$objective,
-#' scenario ="RIL3", fuel = "0", diversification = TRUE, specieslax = TRUE,
+#' scenario = "RIL3",
 #' objectivelax = TRUE,
 #' advancedloggingparameters = loggingparameters())
 #'
-#' secondtrails <- secondtrailsopening(DTM = DTMParacou,plots = Plots,
-#'    maintrails = MainTrails, treeselectionoutputs = treeselectionoutputs,
+#' secondtrails <- secondtrailsopening(DTM = DTMParacou,
+#'    plots = Plots,
+#'
+#'    treeselectionoutputs = treeselectionoutputs,
 #'    verticalcreekheight = VerticalCreekHeight,
-#'   CostMatrix = list(list(list(Slope = 3, Cost = 3),
+#'    CostMatrix = list(list(list(Slope = 3, Cost = 3),
 #'                            list(Slope = 5, Cost = 5),
 #'                            list(Slope = 12, Cost = 20),
 #'                            list(Slope = 22, Cost = 60),
@@ -77,8 +78,8 @@
 secondtrailsopening <- function(DTM,
                                 plots,
                                 verticalcreekheight,
-                                maintrails ,
                                 treeselectionoutputs,
+                                #maintrails,
                                 CostMatrix = list(list(list(Slope = 3, Cost = 3),
                                                        list(Slope = 5, Cost = 5),
                                                        list(Slope = 12, Cost = 20),
@@ -101,8 +102,11 @@ secondtrailsopening <- function(DTM,
   if(!inherits(treeselectionoutputs, "list"))
     stop("The 'treeselectionoutputs' arguments of the 'secondtrailsopening' function must be list following treeselection output format")
 
-  if(!any(unlist(lapply(list( plots, maintrails ), inherits, "sf"))))
-    stop("The 'plots', 'maintrails'  arguments of the 'secondtrailsopening' function must be sf polygon")
+  if(!any(unlist(lapply(list(plots), inherits, "SpatialPolygonsDataFrame"))))
+  stop("The 'plots' argument of the 'secondtrailsopening' function must be SpatialPolygonsDataFrame")
+
+  # if(!any(unlist(lapply(list(maintrails), inherits, "sf" ))))
+  #   stop("The 'maintrails' argument of the 'secondtrailsopening' function must be sf polygon")
 
   if(!any(unlist(lapply(list(DTM), inherits, "RasterLayer"))))
     stop("The 'DTM' argument of the 'secondtrailsopening' function must be raster")
@@ -112,8 +116,8 @@ secondtrailsopening <- function(DTM,
   }
 
   # Global Variables
-  slope <- x <- y <- Harvestable <- idTree <- ID <- type <- ptAcc <- NULL
-  EstCost <- n.overlaps <- TypeAcc <- IDpts <- Logged <- HarvestableAreaDefintionOutputs <- NULL
+  slope <- x <- y <- Harvestable <- idTree <- ID <- type <- ptAcc <- plotslope <- NULL
+  EstCost <- n.overlaps <- TypeAcc <- IDpts <- Logged <- harvestablepolygons<- HarvestableAreaDefintionOutputs <- NULL
 
   ##################################
 
@@ -134,10 +138,27 @@ secondtrailsopening <- function(DTM,
                                fun=fill.boundaries,
                                na.rm=F, pad=T)
 
+# Transformation of vertical creek height raster
+
+  VerticalCreekHeightExtExtended <- raster::extend(verticalcreekheight, c(1,1))
+
+  VerticalCreekHeightExtended <- raster::focal(VerticalCreekHeightExtExtended,
+                                               matrix(1,3,3),
+                                               fun=fill.boundaries,
+                                               na.rm=F, pad=T)
+
+# Set maintrails outside the plot
+
+  premaintrails <- DTMExtended > -Inf
+  premaintrails<- rasterToPolygons(premaintrails, dissolve=T)
+  maintrails <- premaintrails %>% st_as_sf() %>% st_cast(to = 'LINESTRING', warn= FALSE)
+
+
+
 # Generate accessible area from HarvestablePolygones and winching choice
 
 
-  HarvestableAreaDefintionOutputs <- HarvestableAreaDefinition(topography = DTMExtended, verticalcreekheight = verticalcreekheight)
+  HarvestableAreaDefintionOutputs <- HarvestableAreaDefinition(topography = DTMExtended, verticalcreekheight = VerticalCreekHeightExtended)
 
   harvestablepolygons <- HarvestableAreaDefintionOutputs[[1]]
 
@@ -157,18 +178,19 @@ secondtrailsopening <- function(DTM,
   # Generate intersections between accessible area and Maintrails (ID = accessible area index)
   Partmaintrails <- st_intersection(st_geometry(maintrails)  ,
                                     st_geometry(Accessmaintrails %>%
-                                      st_buffer(dist = 1))) %>%
-    st_buffer(dist = 1) %>% st_union(by_feature = T) %>%
+                                      st_buffer(dist = raster::res(DTM)))) %>%
+    st_buffer(dist = raster::res(DTM)) %>%
+    st_union(by_feature = T) %>%
     st_intersection(st_as_sf(plots) %>% st_union()) %>%
     st_cast("MULTIPOLYGON")  %>%
     st_as_sf() %>%
     st_set_agr(value = "constant") %>%
-    st_join(Accessmaintrails)
+    st_join(Accessmaintrails, join = st_intersects)
 
   # Generate point access in the intersections between accessible area and Maintrails (ID = accessible area index)
   AccessPoint <- Partmaintrails  %>%
     st_sample( rep(1,dim(Partmaintrails)[1]) ,type = "random", by_polygon=TRUE) %>% st_as_sf() %>%
-    st_join(Partmaintrails) %>%
+    st_join(Partmaintrails, join = st_intersects) %>%
     mutate(idTree = NA)
 
  # Generate Cost raster --> cf CostMatrix
